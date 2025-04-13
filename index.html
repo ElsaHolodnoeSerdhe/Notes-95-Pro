@@ -1,0 +1,2656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заметки 95 Pro</title>
+    <style>
+        /* Ретро-стили Windows 95/98 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #008080;
+            font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Arial, sans-serif;
+            font-size: 12px;
+            color: #000;
+            user-select: none;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .desktop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        .window {
+            position: absolute;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            background: #c0c0c0;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            min-width: 300px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .window-header {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: white;
+            padding: 3px 5px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+        
+        .window-controls {
+            display: flex;
+        }
+        
+        .window-control {
+            width: 16px;
+            height: 14px;
+            margin-left: 2px;
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            text-align: center;
+            line-height: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .window-body {
+            padding: 8px;
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .menu-bar {
+            display: flex;
+            background: #c0c0c0;
+            border-bottom: 1px solid #808080;
+            padding: 2px 0;
+        }
+        
+        .menu-item {
+            padding: 2px 8px;
+            margin: 0 2px;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover {
+            background: #000080;
+            color: white;
+        }
+        
+        .menu-dropdown {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            z-index: 100;
+            display: none;
+        }
+        
+        .menu-dropdown-item {
+            padding: 3px 25px 3px 10px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .menu-dropdown-item:hover {
+            background: #000080;
+            color: white;
+        }
+        
+        .menu-dropdown-item.disabled {
+            color: #808080;
+            cursor: default;
+        }
+        
+        .menu-dropdown-item.disabled:hover {
+            background: #c0c0c0;
+        }
+        
+        .menu-dropdown-separator {
+            height: 1px;
+            background: #808080;
+            margin: 2px 0;
+            border-top: 1px solid #dfdfdf;
+        }
+        
+        .button {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 2px 8px;
+            cursor: pointer;
+            margin: 2px;
+            min-width: 75px;
+            text-align: center;
+        }
+        
+        .button:active {
+            border-top-color: #808080;
+            border-left-color: #808080;
+            border-right-color: #dfdfdf;
+            border-bottom-color: #dfdfdf;
+        }
+        
+        .button:disabled {
+            color: #808080;
+            cursor: default;
+        }
+        
+        .button:disabled:active {
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+        }
+        
+        .toolbar {
+            display: flex;
+            padding: 4px;
+            background: #c0c0c0;
+            border-bottom: 1px solid #808080;
+        }
+        
+        .tool-button {
+            width: 24px;
+            height: 24px;
+            margin: 0 2px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tool-button:active {
+            border-top-color: #808080;
+            border-left-color: #808080;
+            border-right-color: #dfdfdf;
+            border-bottom-color: #dfdfdf;
+        }
+        
+        .tool-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        .tool-button:disabled:active {
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+        }
+        
+        .tool-separator {
+            width: 8px;
+            border-left: 1px solid #808080;
+            border-right: 1px solid #dfdfdf;
+            margin: 0 5px;
+        }
+        
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #dfdfdf;
+            padding: 2px 5px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        input, textarea, select {
+            background: white;
+            border: 2px inset #dfdfdf;
+            padding: 2px;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        
+        textarea {
+            width: 100%;
+            flex: 1;
+            resize: none;
+        }
+        
+        .tab-bar {
+            display: flex;
+            background: #c0c0c0;
+            border-bottom: 1px solid #808080;
+        }
+        
+        .tab {
+            padding: 3px 10px;
+            margin-right: 2px;
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: white;
+            border: 1px solid #808080;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            z-index: 1000;
+            padding: 8px;
+            min-width: 300px;
+            display: none;
+        }
+        
+        .dialog-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .dialog-body {
+            margin: 10px 0;
+        }
+        
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        
+        .list-item {
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+        
+        .list-item:hover {
+            background: #000080;
+            color: white;
+        }
+        
+        /* Иконки (упрощенные) */
+        .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 3px;
+            vertical-align: middle;
+            background-color: #c0c0c0;
+            position: relative;
+        }
+        
+        .icon-new:after {
+            content: "N";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-open:after {
+            content: "O";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-save:after {
+            content: "S";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-cut:after {
+            content: "X";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-copy:after {
+            content: "C";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-paste:after {
+            content: "P";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-bold:after {
+            content: "B";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-italic:after {
+            content: "I";
+            font-style: italic;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-underline:after {
+            content: "U";
+            text-decoration: underline;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-help:after {
+            content: "?";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-print:after {
+            content: "P";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-find:after {
+            content: "F";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-replace:after {
+            content: "R";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-undo:after {
+            content: "↩";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        .icon-redo:after {
+            content: "↪";
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        
+        /* Стили для выделенного текста */
+        .bold-text {
+            font-weight: bold;
+        }
+        
+        .italic-text {
+            font-style: italic;
+        }
+        
+        .underline-text {
+            text-decoration: underline;
+        }
+        
+        /* Стили для модального оверлея */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        /* Стили для контекстного меню */
+        .context-menu {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .context-menu-item {
+            padding: 3px 25px 3px 10px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .context-menu-item:hover {
+            background: #000080;
+            color: white;
+        }
+        
+        .context-menu-separator {
+            height: 1px;
+            background: #808080;
+            margin: 2px 0;
+            border-top: 1px solid #dfdfdf;
+        }
+        
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #dfdfdf;
+            border-left-color: #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 10px;
+            max-width: 300px;
+            z-index: 1002;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Главное окно приложения -->
+        <div class="window" id="main-window" style="width: 700px; height: 500px; left: 50px; top: 50px;">
+            <div class="window-header">
+                <span>Заметки 95 Pro</span>
+                <div class="window-controls">
+                    <div class="window-control" id="minimize-btn">_</div>
+                    <div class="window-control" id="maximize-btn">□</div>
+                    <div class="window-control" id="close-btn">X</div>
+                </div>
+            </div>
+            
+            <div class="menu-bar">
+                <div class="menu-item" id="file-menu">Файл</div>
+                <div class="menu-item" id="edit-menu">Правка</div>
+                <div class="menu-item" id="format-menu">Формат</div>
+                <div class="menu-item" id="view-menu">Вид</div>
+                <div class="menu-item" id="help-menu">Справка</div>
+                
+                <!-- Меню "Файл" -->
+                <div class="menu-dropdown" id="file-dropdown">
+                    <div class="menu-dropdown-item" id="new-note"><span class="icon icon-new"></span>Создать</div>
+                    <div class="menu-dropdown-item" id="open-note"><span class="icon icon-open"></span>Открыть...</div>
+                    <div class="menu-dropdown-item" id="save-note"><span class="icon icon-save"></span>Сохранить</div>
+                    <div class="menu-dropdown-item" id="save-as-note">Сохранить как...</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="export-note">Экспорт...</div>
+                    <div class="menu-dropdown-item" id="import-note">Импорт...</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="print-note"><span class="icon icon-print"></span>Печать...</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="exit-app">Выход</div>
+                </div>
+                
+                <!-- Меню "Правка" -->
+                <div class="menu-dropdown" id="edit-dropdown">
+                    <div class="menu-dropdown-item" id="undo-action"><span class="icon icon-undo"></span>Отменить</div>
+                    <div class="menu-dropdown-item" id="redo-action"><span class="icon icon-redo"></span>Повторить</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="cut-action"><span class="icon icon-cut"></span>Вырезать</div>
+                    <div class="menu-dropdown-item" id="copy-action"><span class="icon icon-copy"></span>Копировать</div>
+                    <div class="menu-dropdown-item" id="paste-action"><span class="icon icon-paste"></span>Вставить</div>
+                    <div class="menu-dropdown-item" id="delete-action">Удалить</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="find-action"><span class="icon icon-find"></span>Найти...</div>
+                    <div class="menu-dropdown-item" id="replace-action"><span class="icon icon-replace"></span>Заменить...</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="select-all">Выделить все</div>
+                    <div class="menu-dropdown-item" id="time-date">Время/дата</div>
+                </div>
+                
+                <!-- Меню "Формат" -->
+                <div class="menu-dropdown" id="format-dropdown">
+                    <div class="menu-dropdown-item" id="word-wrap">Перенос по словам</div>
+                    <div class="menu-dropdown-item" id="font-settings">Шрифт...</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="make-uppercase">Сделать прописными</div>
+                    <div class="menu-dropdown-item" id="make-lowercase">Сделать строчными</div>
+                </div>
+                
+                <!-- Меню "Вид" -->
+                <div class="menu-dropdown" id="view-dropdown">
+                    <div class="menu-dropdown-item" id="status-bar-toggle">Строка состояния</div>
+                    <div class="menu-dropdown-item" id="toolbar-toggle">Панель инструментов</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="zoom-in">Увеличить</div>
+                    <div class="menu-dropdown-item" id="zoom-out">Уменьшить</div>
+                    <div class="menu-dropdown-item" id="zoom-reset">Сбросить масштаб</div>
+                </div>
+                
+                <!-- Меню "Справка" -->
+                <div class="menu-dropdown" id="help-dropdown">
+                    <div class="menu-dropdown-item" id="help-topics"><span class="icon icon-help"></span>Вызов справки</div>
+                    <div class="menu-dropdown-separator"></div>
+                    <div class="menu-dropdown-item" id="about-program">О программе</div>
+                </div>
+            </div>
+            
+            <div class="toolbar" id="main-toolbar">
+                <div class="tool-button" id="new-btn" title="Создать (Ctrl+N)"><span class="icon icon-new"></span></div>
+                <div class="tool-button" id="open-btn" title="Открыть (Ctrl+O)"><span class="icon icon-open"></span></div>
+                <div class="tool-button" id="save-btn" title="Сохранить (Ctrl+S)"><span class="icon icon-save"></span></div>
+                <div class="tool-button" id="print-btn" title="Печать (Ctrl+P)"><span class="icon icon-print"></span></div>
+                <div class="tool-separator"></div>
+                <div class="tool-button" id="cut-btn" title="Вырезать (Ctrl+X)"><span class="icon icon-cut"></span></div>
+                <div class="tool-button" id="copy-btn" title="Копировать (Ctrl+C)"><span class="icon icon-copy"></span></div>
+                <div class="tool-button" id="paste-btn" title="Вставить (Ctrl+V)"><span class="icon icon-paste"></span></div>
+                <div class="tool-separator"></div>
+                <div class="tool-button" id="undo-btn" title="Отменить (Ctrl+Z)"><span class="icon icon-undo"></span></div>
+                <div class="tool-button" id="redo-btn" title="Повторить (Ctrl+Y)"><span class="icon icon-redo"></span></div>
+                <div class="tool-separator"></div>
+                <div class="tool-button" id="find-btn" title="Найти (Ctrl+F)"><span class="icon icon-find"></span></div>
+                <div class="tool-button" id="replace-btn" title="Заменить (Ctrl+H)"><span class="icon icon-replace"></span></div>
+                <div class="tool-separator"></div>
+                <div class="tool-button" id="bold-btn" title="Жирный (Ctrl+B)"><span class="icon icon-bold"></span></div>
+                <div class="tool-button" id="italic-btn" title="Курсив (Ctrl+I)"><span class="icon icon-italic"></span></div>
+                <div class="tool-button" id="underline-btn" title="Подчеркнутый (Ctrl+U)"><span class="icon icon-underline"></span></div>
+            </div>
+            
+            <div class="tab-bar">
+                <div class="tab active" data-tab="editor">Редактор</div>
+                <div class="tab" data-tab="notes-list">Все заметки</div>
+                <div class="tab" data-tab="search">Поиск</div>
+                <div class="tab" data-tab="stats">Статистика</div>
+            </div>
+            
+            <div class="window-body">
+                <!-- Вкладка редактора -->
+                <div class="tab-content" id="editor-tab">
+                    <input type="text" id="note-title" placeholder="Название заметки" style="width: 100%; margin-bottom: 5px;">
+                    <div id="note-content" contenteditable="true" style="flex: 1; overflow: auto; border: 1px inset #dfdfdf; padding: 5px; background: white;"></div>
+                </div>
+                
+                <!-- Вкладка списка заметок -->
+                <div class="tab-content" id="notes-list-tab" style="display: none;">
+                    <div style="margin-bottom: 10px; display: flex;">
+                        <input type="text" id="notes-filter" placeholder="Фильтр заметок..." style="flex: 1; margin-right: 5px;">
+                        <select id="notes-sort" style="width: 120px;">
+                            <option value="date-desc">Сначала новые</option>
+                            <option value="date-asc">Сначала старые</option>
+                            <option value="title-asc">По названию (А-Я)</option>
+                            <option value="title-desc">По названию (Я-А)</option>
+                        </select>
+                    </div>
+                    <div id="notes-list-container" style="height: 350px; overflow-y: auto; border: 1px inset #dfdfdf; padding: 5px; background: white;"></div>
+                    <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                        <div id="notes-count">Заметок: 0</div>
+                        <button class="button" id="delete-selected-notes">Удалить выбранные</button>
+                    </div>
+                </div>
+                
+                <!-- Вкладка поиска -->
+                <div class="tab-content" id="search-tab" style="display: none;">
+                    <div style="margin-bottom: 10px;">
+                        <input type="text" id="search-query" placeholder="Что ищем?" style="width: 200px;">
+                        <button class="button" id="search-btn">Найти</button>
+                        <label style="margin-left: 10px;"><input type="checkbox" id="case-sensitive"> Учитывать регистр</label>
+                        <label style="margin-left: 10px;"><input type="checkbox" id="whole-word"> Целое слово</label>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <input type="text" id="replace-query" placeholder="Заменить на..." style="width: 200px;">
+                        <button class="button" id="replace-btn">Заменить</button>
+                        <button class="button" id="replace-all-btn">Заменить все</button>
+                    </div>
+                    <div id="search-results" style="height: 300px; overflow-y: auto; border: 1px inset #dfdfdf; padding: 5px; background: white;"></div>
+                    <div style="margin-top: 5px;" id="search-status">Найдено: 0 совпадений</div>
+                </div>
+                
+                <!-- Вкладка статистики -->
+                <div class="tab-content" id="stats-tab" style="display: none;">
+                    <div style="margin-bottom: 10px; font-weight: bold;">Статистика заметок</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <div style="font-weight: bold; margin-bottom: 5px;">Общая информация</div>
+                            <div id="total-notes">Всего заметок: 0</div>
+                            <div id="total-words">Всего слов: 0</div>
+                            <div id="total-chars">Всего символов: 0</div>
+                            <div id="last-updated">Последнее обновление: никогда</div>
+                        </div>
+                        <div>
+                            <div style="font-weight: bold; margin-bottom: 5px;">Самая большая заметка</div>
+                            <div id="largest-note-title">Название: -</div>
+                            <div id="largest-note-words">Слов: 0</div>
+                            <div id="largest-note-chars">Символов: 0</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Распределение по дням</div>
+                        <div id="notes-per-day" style="height: 150px; overflow-y: auto; border: 1px inset #dfdfdf; padding: 5px; background: white;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-bar" id="app-status-bar">
+                <div id="status-message">Готов</div>
+                <div id="status-info">LN 1, COL 1</div>
+            </div>
+        </div>
+        
+        <!-- Диалог "О программе" -->
+        <div class="dialog" id="about-dialog">
+            <div class="dialog-title">О программе "Заметки 95 Pro"</div>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div style="font-weight: bold; font-size: 14px;">Заметки 95 Pro</div>
+                <div>Версия 2.0 (Полная версия)</div>
+                <div style="margin-top: 10px;">© 2023 Microsoft Corporation</div>
+                <div style="margin-top: 20px; font-size: 11px;">Ретро-приложение для заметок с полным функционалом</div>
+                <div style="margin-top: 5px; font-size: 11px;">Все данные хранятся локально в вашем браузере</div>
+            </div>
+            <div class="dialog-buttons">
+                <button class="button" id="close-about">OK</button>
+            </div>
+        </div>
+        
+        <!-- Диалог "Шрифт" -->
+        <div class="dialog" id="font-dialog">
+            <div class="dialog-title">Шрифт</div>
+            <div class="dialog-body">
+                <div style="margin-bottom: 5px;">Шрифт:</div>
+                <select id="font-family" style="width: 100%; margin-bottom: 10px;">
+                    <option value="Arial">Arial</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="MS Sans Serif" selected>MS Sans Serif</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                </select>
+                
+                <div style="margin-bottom: 5px;">Размер:</div>
+                <select id="font-size" style="width: 100%; margin-bottom: 10px;">
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12" selected>12</option>
+                    <option value="14">14</option>
+                    <option value="16">16</option>
+                    <option value="18">18</option>
+                    <option value="20">20</option>
+                    <option value="22">22</option>
+                    <option value="24">24</option>
+                </select>
+                
+                <div style="margin-bottom: 5px;">Стиль:</div>
+                <label><input type="checkbox" id="font-bold"> Жирный</label><br>
+                <label><input type="checkbox" id="font-italic"> Курсив</label><br>
+                <label><input type="checkbox" id="font-underline"> Подчеркнутый</label>
+                
+                <div style="margin-top: 10px;">
+                    <label><input type="checkbox" id="apply-to-all"> Применить ко всем заметкам</label>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button class="button" id="apply-font">Применить</button>
+                <button class="button" id="cancel-font">Отмена</button>
+            </div>
+        </div>
+        
+        <!-- Диалог "Печать" -->
+        <div class="dialog" id="print-dialog">
+            <div class="dialog-title">Печать</div>
+            <div class="dialog-body">
+                <div style="margin-bottom: 10px;">Параметры печати:</div>
+                <label><input type="checkbox" id="print-title" checked> Печатать заголовок</label><br>
+                <label><input type="checkbox" id="print-date" checked> Печатать дату</label><br>
+                <label><input type="checkbox" id="print-line-numbers"> Печатать номера строк</label>
+                
+                <div style="margin-top: 15px;">
+                    <div style="margin-bottom: 5px;">Ориентация:</div>
+                    <label><input type="radio" name="print-orientation" value="portrait" checked> Книжная</label>
+                    <label style="margin-left: 15px;"><input type="radio" name="print-orientation" value="landscape"> Альбомная</label>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button class="button" id="print-preview-btn">Предпросмотр</button>
+                <button class="button" id="print-cancel-btn">Отмена</button>
+                <button class="button" id="print-now-btn">Печать</button>
+            </div>
+        </div>
+        
+        <!-- Диалог "Найти и заменить" -->
+        <div class="dialog" id="find-dialog">
+            <div class="dialog-title">Найти и заменить</div>
+            <div class="dialog-body">
+                <div style="margin-bottom: 5px;">Найти:</div>
+                <input type="text" id="find-text" style="width: 100%; margin-bottom: 10px;">
+                
+                <div style="margin-bottom: 5px;">Заменить на:</div>
+                <input type="text" id="replace-text" style="width: 100%; margin-bottom: 10px;">
+                
+                <div style="margin-bottom: 5px;">Параметры:</div>
+                <label><input type="checkbox" id="find-case-sensitive"> Учитывать регистр</label><br>
+                <label><input type="checkbox" id="find-whole-word"> Целое слово</label><br>
+                <label><input type="checkbox" id="find-regex"> Регулярное выражение</label>
+            </div>
+            <div class="dialog-buttons">
+                <button class="button" id="find-next-btn">Найти далее</button>
+                <button class="button" id="replace-btn-dlg">Заменить</button>
+                <button class="button" id="replace-all-btn-dlg">Заменить все</button>
+                <button class="button" id="find-cancel-btn">Отмена</button>
+            </div>
+        </div>
+        
+        <!-- Диалог "Экспорт" -->
+        <div class="dialog" id="export-dialog">
+            <div class="dialog-title">Экспорт заметки</div>
+            <div class="dialog-body">
+                <div style="margin-bottom: 5px;">Формат:</div>
+                <select id="export-format" style="width: 100%; margin-bottom: 10px;">
+                    <option value="txt">Текстовый файл (.txt)</option>
+                    <option value="html">HTML-документ (.html)</option>
+                    <option value="pdf">PDF-документ (.pdf)</option>
+                    <option value="doc">Документ Word (.doc)</option>
+                </select>
+                
+                <div style="margin-bottom: 5px;">Параметры:</div>
+                <label><input type="checkbox" id="export-title" checked> Включить заголовок</label><br>
+                <label><input type="checkbox" id="export-date" checked> Включить дату</label><br>
+                <label><input type="checkbox" id="export-styles" checked> Сохранить форматирование</label>
+            </div>
+            <div class="dialog-buttons">
+                <button class="button" id="export-cancel-btn">Отмена</button>
+                <button class="button" id="export-now-btn">Экспорт</button>
+            </div>
+        </div>
+        
+        <!-- Диалог "Импорт" -->
+        <div class="dialog" id="import-dialog">
+            <div class="dialog-title">Импорт заметки</div>
+            <div class="dialog-body">
+                <div style="margin-bottom: 5px;">Выберите файл для импорта:</div>
+                <input type="file" id="import-file" style="width: 100%; margin-bottom: 10px;">
+                
+                <div style="margin-bottom: 5px;">Параметры:</div>
+                <label><input type="checkbox" id="import-overwrite"> Перезаписать текущую заметку</label><br>
+                <label><input type="checkbox" id="import-preserve-format" checked> Сохранить форматирование</label>
+            </div>
+            <div class="dialog-buttons">
+                <button class="button" id="import-cancel-btn">Отмена</button>
+                <button class="button" id="import-now-btn">Импорт</button>
+            </div>
+        </div>
+        
+        <!-- Контекстное меню -->
+        <div class="context-menu" id="text-context-menu">
+            <div class="context-menu-item" id="ctx-cut"><span class="icon icon-cut"></span>Вырезать</div>
+            <div class="context-menu-item" id="ctx-copy"><span class="icon icon-copy"></span>Копировать</div>
+            <div class="context-menu-item" id="ctx-paste"><span class="icon icon-paste"></span>Вставить</div>
+            <div class="context-menu-separator"></div>
+            <div class="context-menu-item" id="ctx-bold"><span class="icon icon-bold"></span>Жирный</div>
+            <div class="context-menu-item" id="ctx-italic"><span class="icon icon-italic"></span>Курсив</div>
+            <div class="context-menu-item" id="ctx-underline"><span class="icon icon-underline"></span>Подчеркнутый</div>
+            <div class="context-menu-separator"></div>
+            <div class="context-menu-item" id="ctx-select-all">Выделить все</div>
+        </div>
+        
+        <!-- Модальный оверлей -->
+        <div class="modal-overlay" id="modal-overlay"></div>
+        
+        <!-- Уведомление -->
+        <div class="notification" id="notification">
+            <div id="notification-message"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
+            const app = {
+                notes: JSON.parse(localStorage.getItem('retro-notes-pro')) || [],
+                currentNoteId: null,
+                isDragging: false,
+                dragStartX: 0,
+                dragStartY: 0,
+                windowStartX: 0,
+                windowStartY: 0,
+                isMaximized: false,
+                originalSize: {},
+                undoStack: [],
+                redoStack: [],
+                zoomLevel: 100,
+                wordWrap: false,
+                showStatusBar: true,
+                showToolbar: true,
+                findState: {
+                    lastSearch: '',
+                    lastIndex: -1,
+                    lastMatches: []
+                }
+            };
+            
+            // ===== ЭЛЕМЕНТЫ ИНТЕРФЕЙСА =====
+            const elements = {
+                mainWindow: document.getElementById('main-window'),
+                minimizeBtn: document.getElementById('minimize-btn'),
+                maximizeBtn: document.getElementById('maximize-btn'),
+                closeBtn: document.getElementById('close-btn'),
+                noteTitle: document.getElementById('note-title'),
+                noteContent: document.getElementById('note-content'),
+                fileMenu: document.getElementById('file-menu'),
+                editMenu: document.getElementById('edit-menu'),
+                formatMenu: document.getElementById('format-menu'),
+                viewMenu: document.getElementById('view-menu'),
+                helpMenu: document.getElementById('help-menu'),
+                fileDropdown: document.getElementById('file-dropdown'),
+                editDropdown: document.getElementById('edit-dropdown'),
+                formatDropdown: document.getElementById('format-dropdown'),
+                viewDropdown: document.getElementById('view-dropdown'),
+                helpDropdown: document.getElementById('help-dropdown'),
+                tabs: document.querySelectorAll('.tab'),
+                tabContents: document.querySelectorAll('.tab-content'),
+                statusBar: document.getElementById('app-status-bar'),
+                toolbar: document.getElementById('main-toolbar'),
+                aboutDialog: document.getElementById('about-dialog'),
+                fontDialog: document.getElementById('font-dialog'),
+                printDialog: document.getElementById('print-dialog'),
+                findDialog: document.getElementById('find-dialog'),
+                exportDialog: document.getElementById('export-dialog'),
+                importDialog: document.getElementById('import-dialog'),
+                contextMenu: document.getElementById('text-context-menu'),
+                modalOverlay: document.getElementById('modal-overlay'),
+                notification: document.getElementById('notification')
+            };
+            
+            // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+            
+            // Сохранение заметок в localStorage
+            function saveNotesToStorage() {
+                localStorage.setItem('retro-notes-pro', JSON.stringify(app.notes));
+                updateStats();
+            }
+            
+            // Обновление статус-бара
+            function updateStatus(message) {
+                document.getElementById('status-message').textContent = message;
+                
+                // Обновляем позицию курсора
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    const preCaretRange = range.cloneRange();
+                    preCaretRange.selectNodeContents(elements.noteContent);
+                    preCaretRange.setEnd(range.endContainer, range.endOffset);
+                    
+                    const text = preCaretRange.toString();
+                    const lines = text.split('\n');
+                    const line = lines.length;
+                    const col = lines[lines.length - 1].length + 1;
+                    
+                    document.getElementById('status-info').textContent = `LN ${line}, COL ${col}`;
+                }
+            }
+            
+            // Показать уведомление
+            function showNotification(message, duration = 3000) {
+                const notification = elements.notification;
+                document.getElementById('notification-message').textContent = message;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, duration);
+            }
+            
+            // Добавление состояния в стек отмены
+            function addToUndoStack() {
+                if (app.currentNoteId) {
+                    const note = getCurrentNote();
+                    if (note) {
+                        app.undoStack.push({
+                            id: note.id,
+                            title: note.title,
+                            content: elements.noteContent.innerHTML
+                        });
+                        
+                        // Ограничиваем размер стека
+                        if (app.undoStack.length > 50) {
+                            app.undoStack.shift();
+                        }
+                        
+                        // Очищаем стек повтора при новом действии
+                        app.redoStack = [];
+                        
+                        updateToolbarStates();
+                    }
+                }
+            }
+            
+            // Обновление состояний кнопок на панели инструментов
+            function updateToolbarStates() {
+                document.getElementById('undo-btn').disabled = app.undoStack.length === 0;
+                document.getElementById('redo-btn').disabled = app.redoStack.length === 0;
+                document.getElementById('cut-btn').disabled = !window.getSelection().toString();
+                document.getElementById('copy-btn').disabled = !window.getSelection().toString();
+                
+                try {
+                    document.getElementById('paste-btn').disabled = !navigator.clipboard.readText();
+                } catch (e) {
+                    document.getElementById('paste-btn').disabled = false;
+                }
+                
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const parentElement = range.commonAncestorContainer.nodeType === 3 ? 
+                        range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+                    
+                    document.getElementById('bold-btn').classList.toggle('active', parentElement.classList.contains('bold-text'));
+                    document.getElementById('italic-btn').classList.toggle('active', parentElement.classList.contains('italic-text'));
+                    document.getElementById('underline-btn').classList.toggle('active', parentElement.classList.contains('underline-text'));
+                }
+            }
+            
+            // Получение текущей заметки
+            function getCurrentNote() {
+                return app.notes.find(n => n.id === app.currentNoteId);
+            }
+            
+            // Подсчет слов в тексте
+            function countWords(text) {
+                return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            }
+            
+            // Обновление статистики
+            function updateStats() {
+                const totalNotes = app.notes.length;
+                let totalWords = 0;
+                let totalChars = 0;
+                let largestNote = null;
+                
+                app.notes.forEach(note => {
+                    const words = countWords(note.content);
+                    const chars = note.content.length;
+                    
+                    totalWords += words;
+                    totalChars += chars;
+                    
+                    if (!largestNote || words > countWords(largestNote.content)) {
+                        largestNote = note;
+                    }
+                });
+                
+                document.getElementById('total-notes').textContent = `Всего заметок: ${totalNotes}`;
+                document.getElementById('total-words').textContent = `Всего слов: ${totalWords}`;
+                document.getElementById('total-chars').textContent = `Всего символов: ${totalChars}`;
+                document.getElementById('last-updated').textContent = `Последнее обновление: ${new Date().toLocaleString()}`;
+                
+                if (largestNote) {
+                    document.getElementById('largest-note-title').textContent = `Название: ${largestNote.title}`;
+                    document.getElementById('largest-note-words').textContent = `Слов: ${countWords(largestNote.content)}`;
+                    document.getElementById('largest-note-chars').textContent = `Символов: ${largestNote.content.length}`;
+                }
+                
+                // Статистика по дням
+                const notesByDay = {};
+                app.notes.forEach(note => {
+                    const date = new Date(note.updatedAt).toLocaleDateString();
+                    notesByDay[date] = (notesByDay[date] || 0) + 1;
+                });
+                
+                const notesPerDay = document.getElementById('notes-per-day');
+                notesPerDay.innerHTML = '';
+                
+                for (const date in notesByDay) {
+                    const div = document.createElement('div');
+                    div.textContent = `${date}: ${notesByDay[date]} заметок`;
+                    notesPerDay.appendChild(div);
+                }
+            }
+            
+            // ===== ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ =====
+            
+            // Создание новой заметки
+            function createNewNote() {
+                addToUndoStack();
+                
+                app.currentNoteId = Date.now().toString();
+                elements.noteTitle.value = 'Без названия';
+                elements.noteContent.innerHTML = '';
+                
+                updateStatus('Создана новая заметка');
+                updateToolbarStates();
+            }
+            
+            // Сохранение заметки
+            function saveNote() {
+                if (!app.currentNoteId) {
+                    createNewNote();
+                }
+                
+                const title = elements.noteTitle.value.trim() || 'Без названия';
+                const content = elements.noteContent.innerHTML;
+                
+                const note = {
+                    id: app.currentNoteId,
+                    title: title,
+                    content: content,
+                    createdAt: app.notes.find(n => n.id === app.currentNoteId)?.createdAt || new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    fontSettings: {
+                        family: elements.noteContent.style.fontFamily || 'MS Sans Serif',
+                        size: elements.noteContent.style.fontSize || '12px',
+                        bold: false,
+                        italic: false,
+                        underline: false
+                    }
+                };
+                
+                const existingIndex = app.notes.findIndex(n => n.id === app.currentNoteId);
+                if (existingIndex >= 0) {
+                    app.notes[existingIndex] = note;
+                } else {
+                    app.notes.unshift(note);
+                }
+                
+                saveNotesToStorage();
+                updateStatus('Заметка сохранена');
+                showNotification('Заметка сохранена');
+            }
+            
+            // Загрузка заметки
+            function loadNote(id) {
+                const note = app.notes.find(n => n.id === id);
+                if (note) {
+                    addToUndoStack();
+                    
+                    app.currentNoteId = note.id;
+                    elements.noteTitle.value = note.title;
+                    elements.noteContent.innerHTML = note.content;
+                    
+                    if (note.fontSettings) {
+                        elements.noteContent.style.fontFamily = note.fontSettings.family;
+                        elements.noteContent.style.fontSize = note.fontSettings.size;
+                    }
+                    
+                    updateStatus(`Заметка "${note.title}" загружена`);
+                    updateToolbarStates();
+                }
+            }
+            
+            // Удаление заметки
+            function deleteNote(id) {
+                if (confirm('Удалить эту заметку?')) {
+                    const index = app.notes.findIndex(n => n.id === id);
+                    if (index >= 0) {
+                        app.notes.splice(index, 1);
+                        saveNotesToStorage();
+                        
+                        if (id === app.currentNoteId) {
+                            createNewNote();
+                        }
+                        
+                        updateStatus('Заметка удалена');
+                        showNotification('Заметка удалена');
+                    }
+                }
+            }
+            
+            // Удаление выбранных заметок
+            function deleteSelectedNotes() {
+                const selected = document.querySelectorAll('#notes-list-container .selected');
+                if (selected.length === 0) return;
+                
+                if (confirm(`Удалить ${selected.length} заметок?`)) {
+                    selected.forEach(item => {
+                        const id = item.dataset.id;
+                        const index = app.notes.findIndex(n => n.id === id);
+                        if (index >= 0) {
+                            app.notes.splice(index, 1);
+                            
+                            if (id === app.currentNoteId) {
+                                createNewNote();
+                            }
+                        }
+                    });
+                    
+                    saveNotesToStorage();
+                    renderNotesList();
+                    updateStatus(`Удалено ${selected.length} заметок`);
+                    showNotification(`Удалено ${selected.length} заметок`);
+                }
+            }
+            
+            // Отображение списка заметок
+            function renderNotesList() {
+                const container = document.getElementById('notes-list-container');
+                container.innerHTML = '';
+                
+                if (app.notes.length === 0) {
+                    container.innerHTML = '<div style="color: #666; text-align: center; margin-top: 20px;">Нет сохраненных заметок</div>';
+                    document.getElementById('notes-count').textContent = 'Заметок: 0';
+                    return;
+                }
+                
+                const filter = document.getElementById('notes-filter').value.toLowerCase();
+                const sortBy = document.getElementById('notes-sort').value;
+                
+                let filteredNotes = [...app.notes];
+                
+                // Фильтрация
+                if (filter) {
+                    filteredNotes = filteredNotes.filter(n => 
+                        n.title.toLowerCase().includes(filter) || 
+                        n.content.toLowerCase().includes(filter)
+                    );
+                }
+                
+                // Сортировка
+                switch (sortBy) {
+                    case 'date-desc':
+                        filteredNotes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+                        break;
+                    case 'date-asc':
+                        filteredNotes.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+                        break;
+                    case 'title-asc':
+                        filteredNotes.sort((a, b) => a.title.localeCompare(b.title));
+                        break;
+                    case 'title-desc':
+                        filteredNotes.sort((a, b) => b.title.localeCompare(a.title));
+                        break;
+                }
+                
+                // Отображение
+                filteredNotes.forEach(note => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    if (note.id === app.currentNoteId) {
+                        item.classList.add('selected');
+                    }
+                    item.dataset.id = note.id;
+                    item.innerHTML = `
+                        <div style="font-weight: bold;">${note.title}</div>
+                        <div style="font-size: 11px; color: #666;">${note.content.replace(/<[^>]*>/g, '').substring(0, 50)}${note.content.length > 50 ? '...' : ''}</div>
+                        <div style="font-size: 10px; color: #999;">${new Date(note.updatedAt).toLocaleString()}</div>
+                    `;
+                    
+                    item.addEventListener('click', function(e) {
+                        if (e.ctrlKey || e.metaKey) {
+                            this.classList.toggle('selected');
+                        } else {
+                            document.querySelectorAll('#notes-list-container .list-item').forEach(i => i.classList.remove('selected'));
+                            this.classList.add('selected');
+                            loadNote(note.id);
+                        }
+                    });
+                    
+                    item.addEventListener('dblclick', function() {
+                        loadNote(note.id);
+                        document.querySelector('.tab[data-tab="editor"]').click();
+                    });
+                    
+                    container.appendChild(item);
+                });
+                
+                document.getElementById('notes-count').textContent = `Заметок: ${filteredNotes.length}/${app.notes.length}`;
+            }
+            
+            // Поиск по заметкам
+            function performSearch() {
+                const query = document.getElementById('search-query').value;
+                const caseSensitive = document.getElementById('case-sensitive').checked;
+                const wholeWord = document.getElementById('whole-word').checked;
+                const resultsContainer = document.getElementById('search-results');
+                
+                if (!query) {
+                    resultsContainer.innerHTML = '<div style="color: #666; text-align: center; margin-top: 20px;">Введите поисковый запрос</div>';
+                    document.getElementById('search-status').textContent = 'Найдено: 0 совпадений';
+                    return;
+                }
+                
+                let regex;
+                try {
+                    if (wholeWord) {
+                        regex = new RegExp(caseSensitive ? `\\b${query}\\b` : `\\b${query}\\b`, 'gi');
+                    } else {
+                        regex = new RegExp(caseSensitive ? query : query, 'gi');
+                    }
+                } catch (e) {
+                    resultsContainer.innerHTML = '<div style="color: red; text-align: center; margin-top: 20px;">Некорректное регулярное выражение</div>';
+                    document.getElementById('search-status').textContent = 'Ошибка поиска';
+                    return;
+                }
+                
+                let resultsHtml = '';
+                let matchCount = 0;
+                
+                app.notes.forEach(note => {
+                    const titleMatch = note.title.match(regex) || [];
+                    const contentMatch = note.content.replace(/<[^>]*>/g, '').match(regex) || [];
+                    
+                    if (titleMatch.length > 0 || contentMatch.length > 0) {
+                        matchCount += titleMatch.length + contentMatch.length;
+                        
+                        resultsHtml += `
+                            <div class="list-item" data-id="${note.id}">
+                                <div style="font-weight: bold;">${highlightMatches(note.title, regex)}</div>
+                                <div style="font-size: 11px; color: #666;">${highlightMatches(note.content.replace(/<[^>]*>/g, '').substring(0, 100), regex)}${note.content.length > 100 ? '...' : ''}</div>
+                                <div style="font-size: 10px; color: #999;">${new Date(note.updatedAt).toLocaleString()} (совпадений: ${titleMatch.length + contentMatch.length})</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                resultsContainer.innerHTML = resultsHtml || '<div style="color: #666; text-align: center; margin-top: 20px;">Ничего не найдено</div>';
+                document.getElementById('search-status').textContent = `Найдено: ${matchCount} совпадений`;
+                
+                // Добавляем обработчики клика на результаты
+                document.querySelectorAll('#search-results .list-item').forEach((item, index) => {
+                    item.addEventListener('click', function() {
+                        loadNote(this.dataset.id);
+                        document.querySelector('.tab[data-tab="editor"]').click();
+                    });
+                });
+            }
+            
+            // Замена текста
+            function performReplace() {
+                const searchQuery = document.getElementById('search-query').value;
+                const replaceQuery = document.getElementById('replace-query').value;
+                const caseSensitive = document.getElementById('case-sensitive').checked;
+                const wholeWord = document.getElementById('whole-word').checked;
+                
+                if (!searchQuery) {
+                    showNotification('Введите текст для поиска');
+                    return;
+                }
+                
+                let regex;
+                try {
+                    if (wholeWord) {
+                        regex = new RegExp(caseSensitive ? `\\b${searchQuery}\\b` : `\\b${searchQuery}\\b`, 'gi');
+                    } else {
+                        regex = new RegExp(caseSensitive ? searchQuery : searchQuery, 'gi');
+                    }
+                } catch (e) {
+                    showNotification('Некорректное регулярное выражение');
+                    return;
+                }
+                
+                if (app.currentNoteId) {
+                    const note = getCurrentNote();
+                    if (note) {
+                        const newContent = note.content.replace(regex, replaceQuery);
+                        if (newContent !== note.content) {
+                            elements.noteContent.innerHTML = newContent;
+                            saveNote();
+                            showNotification('Замена выполнена');
+                        } else {
+                            showNotification('Совпадений не найдено');
+                        }
+                    }
+                }
+            }
+            
+            // Замена всего текста
+            function performReplaceAll() {
+                const searchQuery = document.getElementById('search-query').value;
+                const replaceQuery = document.getElementById('replace-query').value;
+                const caseSensitive = document.getElementById('case-sensitive').checked;
+                const wholeWord = document.getElementById('whole-word').checked;
+                
+                if (!searchQuery) {
+                    showNotification('Введите текст для поиска');
+                    return;
+                }
+                
+                let regex;
+                try {
+                    if (wholeWord) {
+                        regex = new RegExp(caseSensitive ? `\\b${searchQuery}\\b` : `\\b${searchQuery}\\b`, 'gi');
+                    } else {
+                        regex = new RegExp(caseSensitive ? searchQuery : searchQuery, 'gi');
+                    }
+                } catch (e) {
+                    showNotification('Некорректное регулярное выражение');
+                    return;
+                }
+                
+                let replaceCount = 0;
+                
+                app.notes.forEach(note => {
+                    const newContent = note.content.replace(regex, replaceQuery);
+                    if (newContent !== note.content) {
+                        note.content = newContent;
+                        note.updatedAt = new Date().toISOString();
+                        replaceCount++;
+                    }
+                });
+                
+                if (replaceCount > 0) {
+                    saveNotesToStorage();
+                    if (app.currentNoteId) {
+                        loadNote(app.currentNoteId);
+                    }
+                    showNotification(`Заменено ${replaceCount} заметок`);
+                } else {
+                    showNotification('Совпадений не найдено');
+                }
+            }
+            
+            // Подсветка совпадений при поиске
+            function highlightMatches(text, regex) {
+                return text.replace(regex, match => `<span style="background-color: yellow;">${match}</span>`);
+            }
+            
+            // Применение форматирования к выделенному тексту
+            function applyFormatting(className) {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const selectedText = range.toString();
+                    
+                    if (selectedText) {
+                        const span = document.createElement('span');
+                        span.className = className;
+                        span.textContent = selectedText;
+                        
+                        range.deleteContents();
+                        range.insertNode(span);
+                        
+                        // Сохраняем изменения
+                        addToUndoStack();
+                        updateToolbarStates();
+                    }
+                }
+            }
+            
+            // Удаление форматирования с выделенного текста
+            function removeFormatting() {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const selectedText = range.toString();
+                    
+                    if (selectedText) {
+                        const textNode = document.createTextNode(selectedText);
+                        range.deleteContents();
+                        range.insertNode(textNode);
+                        
+                        // Сохраняем изменения
+                        addToUndoStack();
+                        updateToolbarStates();
+                    }
+                }
+            }
+            
+            // Изменение регистра текста
+            function changeTextCase(toUpper) {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const selectedText = range.toString();
+                    
+                    if (selectedText) {
+                        const newText = toUpper ? selectedText.toUpperCase() : selectedText.toLowerCase();
+                        range.deleteContents();
+                        range.insertNode(document.createTextNode(newText));
+                        
+                        // Сохраняем изменения
+                        addToUndoStack();
+                        updateToolbarStates();
+                    }
+                }
+            }
+            
+            // Вставка даты и времени
+            function insertDateTime() {
+                const now = new Date();
+                const dateTimeString = now.toLocaleString();
+                
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(dateTimeString));
+                    
+                    // Сохраняем изменения
+                    addToUndoStack();
+                    updateToolbarStates();
+                }
+            }
+            
+            // Экспорт заметки
+            function exportNote() {
+                if (!app.currentNoteId) {
+                    showNotification('Нет заметки для экспорта');
+                    return;
+                }
+                
+                const note = getCurrentNote();
+                if (!note) return;
+                
+                const format = document.getElementById('export-format').value;
+                const includeTitle = document.getElementById('export-title').checked;
+                const includeDate = document.getElementById('export-date').checked;
+                const includeStyles = document.getElementById('export-styles').checked;
+                
+                let content = '';
+                
+                if (includeTitle) {
+                    content += `<h1>${note.title}</h1>\n`;
+                }
+                
+                if (includeDate) {
+                    content += `<p>Дата: ${new Date(note.updatedAt).toLocaleString()}</p>\n`;
+                }
+                
+                if (includeStyles) {
+                    content += note.content;
+                } else {
+                    content += note.content.replace(/<[^>]*>/g, '');
+                }
+                
+                let blob, filename;
+                
+                switch (format) {
+                    case 'txt':
+                        blob = new Blob([content.replace(/<[^>]*>/g, '')], { type: 'text/plain' });
+                        filename = `${note.title}.txt`;
+                        break;
+                    case 'html':
+                        blob = new Blob([`<!DOCTYPE html><html><head><title>${note.title}</title></head><body>${content}</body></html>`], 
+                                      { type: 'text/html' });
+                        filename = `${note.title}.html`;
+                        break;
+                    case 'pdf':
+                        // В реальном приложении здесь была бы генерация PDF
+                        showNotification('Экспорт в PDF требует дополнительных библиотек');
+                        return;
+                    case 'doc':
+                        // В реальном приложении здесь была бы генерация DOC
+                        showNotification('Экспорт в DOC требует дополнительных библиотек');
+                        return;
+                }
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification(`Заметка экспортирована как ${filename}`);
+                elements.exportDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            }
+            
+            // Импорт заметки
+            function importNote() {
+                const fileInput = document.getElementById('import-file');
+                const overwrite = document.getElementById('import-overwrite').checked;
+                const preserveFormat = document.getElementById('import-preserve-format').checked;
+                
+                if (fileInput.files.length === 0) {
+                    showNotification('Выберите файл для импорта');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    let content = e.target.result;
+                    
+                    if (!preserveFormat) {
+                        content = content.replace(/<[^>]*>/g, '');
+                    }
+                    
+                    if (overwrite && app.currentNoteId) {
+                        // Перезаписываем текущую заметку
+                        const note = getCurrentNote();
+                        if (note) {
+                            note.content = content;
+                            note.updatedAt = new Date().toISOString();
+                            loadNote(note.id);
+                        }
+                    } else {
+                        // Создаем новую заметку
+                        createNewNote();
+                        elements.noteContent.innerHTML = content;
+                        elements.noteTitle.value = file.name.replace(/\.[^/.]+$/, ""); // Удаляем расширение файла
+                        saveNote();
+                    }
+                    
+                    showNotification('Заметка успешно импортирована');
+                    elements.importDialog.style.display = 'none';
+                    elements.modalOverlay.style.display = 'none';
+                };
+                
+                if (file.type === 'text/html' || file.name.endsWith('.html')) {
+                    reader.readAsText(file);
+                } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                    reader.readAsText(file);
+                } else {
+                    showNotification('Неподдерживаемый формат файла');
+                }
+            }
+            
+            // Печать заметки
+            function printNote() {
+                if (!app.currentNoteId) {
+                    showNotification('Нет заметки для печати');
+                    return;
+                }
+                
+                const note = getCurrentNote();
+                if (!note) return;
+                
+                const printTitle = document.getElementById('print-title').checked;
+                const printDate = document.getElementById('print-date').checked;
+                const printLineNumbers = document.getElementById('print-line-numbers').checked;
+                const orientation = document.querySelector('input[name="print-orientation"]:checked').value;
+                
+                let printContent = '<style>';
+                printContent += '@page { size: A4; margin: 1cm; ';
+                printContent += orientation === 'landscape' ? 'size: landscape;' : '';
+                printContent += '}';
+                printContent += 'body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; }';
+                printContent += 'h1 { font-size: 18pt; margin-bottom: 20px; }';
+                printContent += '.line-number { color: #999; margin-right: 10px; }';
+                printContent += '</style>';
+                
+                printContent += '<body>';
+                
+                if (printTitle) {
+                    printContent += `<h1>${note.title}</h1>`;
+                }
+                
+                if (printDate) {
+                    printContent += `<p>Дата: ${new Date(note.updatedAt).toLocaleString()}</p>`;
+                }
+                
+                const lines = note.content.replace(/<[^>]*>/g, '\n').split('\n');
+                
+                printContent += '<div>';
+                lines.forEach((line, index) => {
+                    if (printLineNumbers) {
+                        printContent += `<span class="line-number">${index + 1}</span>`;
+                    }
+                    printContent += line + '<br>';
+                });
+                printContent += '</div>';
+                
+                printContent += '</body>';
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(printContent);
+                printWindow.document.close();
+                
+                // Даем время на загрузку содержимого перед печатью
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+                
+                showNotification('Подготовка к печати...');
+                elements.printDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            }
+            
+            // Поиск текста в заметке
+            function findTextInNote() {
+                const findText = document.getElementById('find-text').value;
+                const caseSensitive = document.getElementById('find-case-sensitive').checked;
+                const wholeWord = document.getElementById('find-whole-word').checked;
+                const useRegex = document.getElementById('find-regex').checked;
+                
+                if (!findText) {
+                    showNotification('Введите текст для поиска');
+                    return;
+                }
+                
+                let regex;
+                try {
+                    if (useRegex) {
+                        regex = new RegExp(findText, caseSensitive ? 'g' : 'gi');
+                    } else if (wholeWord) {
+                        regex = new RegExp(caseSensitive ? `\\b${findText}\\b` : `\\b${findText}\\b`, 'gi');
+                    } else {
+                        regex = new RegExp(caseSensitive ? findText : findText, 'gi');
+                    }
+                } catch (e) {
+                    showNotification('Некорректное регулярное выражение');
+                    return;
+                }
+                
+                const noteContent = elements.noteContent.innerHTML;
+                const textContent = noteContent.replace(/<[^>]*>/g, '');
+                
+                const matches = [...textContent.matchAll(regex)];
+                if (matches.length === 0) {
+                    showNotification('Совпадений не найдено');
+                    return;
+                }
+                
+                // Находим текущую позицию курсора
+                const selection = window.getSelection();
+                let currentPos = 0;
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const preCaretRange = range.cloneRange();
+                    preCaretRange.selectNodeContents(elements.noteContent);
+                    preCaretRange.setEnd(range.endContainer, range.endOffset);
+                    currentPos = preCaretRange.toString().length;
+                }
+                
+                // Находим следующее совпадение после текущей позиции
+                let nextMatch = null;
+                for (const match of matches) {
+                    if (match.index > currentPos) {
+                        nextMatch = match;
+                        break;
+                    }
+                }
+                
+                // Если не нашли после текущей позиции, берем первое совпадение
+                if (!nextMatch && matches.length > 0) {
+                    nextMatch = matches[0];
+                }
+                
+                if (nextMatch) {
+                    // Выделяем найденный текст
+                    let charCount = 0;
+                    let startNode = null, startOffset = 0;
+                    let endNode = null, endOffset = 0;
+                    
+                    const walker = document.createTreeWalker(
+                        elements.noteContent, 
+                        NodeFilter.SHOW_TEXT, 
+                        null, 
+                        false
+                    );
+                    
+                    let node;
+                    while ((node = walker.nextNode())) {
+                        const nodeLength = node.nodeValue.length;
+                        
+                        if (!startNode && charCount + nodeLength >= nextMatch.index) {
+                            startNode = node;
+                            startOffset = nextMatch.index - charCount;
+                        }
+                        
+                        if (startNode && !endNode && charCount + nodeLength >= nextMatch.index + nextMatch[0].length) {
+                            endNode = node;
+                            endOffset = nextMatch.index + nextMatch[0].length - charCount;
+                            break;
+                        }
+                        
+                        charCount += nodeLength;
+                    }
+                    
+                    if (startNode && endNode) {
+                        const range = document.createRange();
+                        range.setStart(startNode, startOffset);
+                        range.setEnd(endNode, endOffset);
+                        
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        
+                        // Прокручиваем к выделенному тексту
+                        range.startContainer.parentNode.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        
+                        showNotification(`Найдено: ${matches.length} совпадений`);
+                    }
+                }
+            }
+            
+            // Замена текста в заметке
+            function replaceTextInNote() {
+                const findText = document.getElementById('find-text').value;
+                const replaceText = document.getElementById('replace-text').value;
+                const caseSensitive = document.getElementById('find-case-sensitive').checked;
+                const wholeWord = document.getElementById('find-whole-word').checked;
+                const useRegex = document.getElementById('find-regex').checked;
+                
+                if (!findText) {
+                    showNotification('Введите текст для поиска');
+                    return;
+                }
+                
+                let regex;
+                try {
+                    if (useRegex) {
+                        regex = new RegExp(findText, caseSensitive ? 'g' : 'gi');
+                    } else if (wholeWord) {
+                        regex = new RegExp(caseSensitive ? `\\b${findText}\\b` : `\\b${findText}\\b`, 'gi');
+                    } else {
+                        regex = new RegExp(caseSensitive ? findText : findText, 'gi');
+                    }
+                } catch (e) {
+                    showNotification('Некорректное регулярное выражение');
+                    return;
+                }
+                
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const selectedText = range.toString();
+                    
+                    if (selectedText.match(regex)) {
+                        range.deleteContents();
+                        range.insertNode(document.createTextNode(selectedText.replace(regex, replaceText)));
+                        
+                        // Сохраняем изменения
+                        addToUndoStack();
+                        updateToolbarStates();
+                        
+                        showNotification('Текст заменен');
+                    } else {
+                        showNotification('Совпадение не найдено');
+                    }
+                } else {
+                    showNotification('Выделите текст для замены');
+                }
+            }
+            
+            // Замена всего текста в заметке
+            function replaceAllTextInNote() {
+                const findText = document.getElementById('find-text').value;
+                const replaceText = document.getElementById('replace-text').value;
+                const caseSensitive = document.getElementById('find-case-sensitive').checked;
+                const wholeWord = document.getElementById('find-whole-word').checked;
+                const useRegex = document.getElementById('find-regex').checked;
+                
+                if (!findText) {
+                    showNotification('Введите текст для поиска');
+                    return;
+                }
+                
+                let regex;
+                try {
+                    if (useRegex) {
+                        regex = new RegExp(findText, caseSensitive ? 'g' : 'gi');
+                    } else if (wholeWord) {
+                        regex = new RegExp(caseSensitive ? `\\b${findText}\\b` : `\\b${findText}\\b`, 'gi');
+                    } else {
+                        regex = new RegExp(caseSensitive ? findText : findText, 'gi');
+                    }
+                } catch (e) {
+                    showNotification('Некорректное регулярное выражение');
+                    return;
+                }
+                
+                const noteContent = elements.noteContent.innerHTML;
+                const newContent = noteContent.replace(regex, replaceText);
+                
+                if (newContent !== noteContent) {
+                    elements.noteContent.innerHTML = newContent;
+                    
+                    // Сохраняем изменения
+                    addToUndoStack();
+                    updateToolbarStates();
+                    
+                    showNotification('Все совпадения заменены');
+                } else {
+                    showNotification('Совпадений не найдено');
+                }
+            }
+            
+            // ===== ОБРАБОТЧИКИ СОБЫТИЙ =====
+            
+            // Переключение вкладок
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Деактивируем все вкладки
+                    elements.tabs.forEach(t => t.classList.remove('active'));
+                    elements.tabContents.forEach(c => c.style.display = 'none');
+                    
+                    // Активируем выбранную
+                    this.classList.add('active');
+                    document.getElementById(`${this.dataset.tab}-tab`).style.display = 'block';
+                    
+                    if (this.dataset.tab === 'notes-list') {
+                        renderNotesList();
+                    } else if (this.dataset.tab === 'stats') {
+                        updateStats();
+                    }
+                });
+            });
+            
+            // Меню "Файл"
+            elements.fileMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideAllDropdowns();
+                elements.fileDropdown.style.display = 'block';
+                elements.fileDropdown.style.left = `${this.offsetLeft}px`;
+                elements.fileDropdown.style.top = `${this.offsetTop + this.offsetHeight}px`;
+            });
+            
+            // Меню "Правка"
+            elements.editMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideAllDropdowns();
+                elements.editDropdown.style.display = 'block';
+                elements.editDropdown.style.left = `${this.offsetLeft}px`;
+                elements.editDropdown.style.top = `${this.offsetTop + this.offsetHeight}px`;
+                
+                // Обновляем состояния пунктов меню
+                document.getElementById('undo-action').className = app.undoStack.length > 0 ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+                document.getElementById('redo-action').className = app.redoStack.length > 0 ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+                
+                const hasSelection = window.getSelection().toString().length > 0;
+                document.getElementById('cut-action').className = hasSelection ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+                document.getElementById('copy-action').className = hasSelection ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+                document.getElementById('delete-action').className = hasSelection ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+                document.getElementById('select-all').className = elements.noteContent.textContent.length > 0 ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+            });
+            
+            // Меню "Формат"
+            elements.formatMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideAllDropdowns();
+                elements.formatDropdown.style.display = 'block';
+                elements.formatDropdown.style.left = `${this.offsetLeft}px`;
+                elements.formatDropdown.style.top = `${this.offsetTop + this.offsetHeight}px`;
+                
+                // Обновляем состояние пункта "Перенос по словам"
+                document.getElementById('word-wrap').textContent = app.wordWrap ? 
+                    'Отключить перенос по словам' : 'Перенос по словам';
+                
+                const hasSelection = window.getSelection().toString().length > 0;
+                document.getElementById('make-uppercase').className = hasSelection ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+                document.getElementById('make-lowercase').className = hasSelection ? 
+                    'menu-dropdown-item' : 'menu-dropdown-item disabled';
+            });
+            
+            // Меню "Вид"
+            elements.viewMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideAllDropdowns();
+                elements.viewDropdown.style.display = 'block';
+                elements.viewDropdown.style.left = `${this.offsetLeft}px`;
+                elements.viewDropdown.style.top = `${this.offsetTop + this.offsetHeight}px`;
+                
+                // Обновляем состояния пунктов меню
+                document.getElementById('status-bar-toggle').textContent = app.showStatusBar ? 
+                    'Скрыть строку состояния' : 'Показать строку состояния';
+                document.getElementById('toolbar-toggle').textContent = app.showToolbar ? 
+                    'Скрыть панель инструментов' : 'Показать панель инструментов';
+            });
+            
+            // Меню "Справка"
+            elements.helpMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideAllDropdowns();
+                elements.helpDropdown.style.display = 'block';
+                elements.helpDropdown.style.left = `${this.offsetLeft}px`;
+                elements.helpDropdown.style.top = `${this.offsetTop + this.offsetHeight}px`;
+            });
+            
+            // Скрытие всех выпадающих меню
+            function hideAllDropdowns() {
+                document.querySelectorAll('.menu-dropdown').forEach(dd => {
+                    dd.style.display = 'none';
+                });
+                elements.contextMenu.style.display = 'none';
+            }
+            
+            // Закрытие меню при клике вне его
+            document.addEventListener('click', hideAllDropdowns);
+            
+            // Обработчики для меню "Файл"
+            document.getElementById('new-note').addEventListener('click', createNewNote);
+            document.getElementById('open-note').addEventListener('click', function() {
+                document.querySelector('.tab[data-tab="notes-list"]').click();
+            });
+            document.getElementById('save-note').addEventListener('click', saveNote);
+            document.getElementById('save-as-note').addEventListener('click', function() {
+                // В реальном приложении здесь была бы логика "Сохранить как"
+                saveNote();
+                showNotification('Функция "Сохранить как" в разработке');
+            });
+            document.getElementById('export-note').addEventListener('click', function() {
+                elements.exportDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+            });
+            document.getElementById('import-note').addEventListener('click', function() {
+                elements.importDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+            });
+            document.getElementById('print-note').addEventListener('click', function() {
+                elements.printDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+            });
+            document.getElementById('exit-app').addEventListener('click', function() {
+                if (confirm('Закрыть приложение?')) {
+                    window.close();
+                    // В реальном приложении здесь было бы закрытие окна
+                    showNotification('Приложение закрыто (в реальной версии окно бы закрылось)');
+                }
+            });
+            
+            // Обработчики для меню "Правка"
+            document.getElementById('undo-action').addEventListener('click', function() {
+                if (app.undoStack.length > 0) {
+                    const state = app.undoStack.pop();
+                    const currentNote = getCurrentNote();
+                    
+                    if (currentNote && currentNote.id === state.id) {
+                        // Сохраняем текущее состояние в стек повтора
+                        app.redoStack.push({
+                            id: currentNote.id,
+                            title: currentNote.title,
+                            content: elements.noteContent.innerHTML
+                        });
+                        
+                        // Восстанавливаем предыдущее состояние
+                        elements.noteContent.innerHTML = state.content;
+                        updateToolbarStates();
+                        showNotification('Действие отменено');
+                    }
+                }
+            });
+            
+            document.getElementById('redo-action').addEventListener('click', function() {
+                if (app.redoStack.length > 0) {
+                    const state = app.redoStack.pop();
+                    const currentNote = getCurrentNote();
+                    
+                    if (currentNote && currentNote.id === state.id) {
+                        // Сохраняем текущее состояние в стек отмены
+                        app.undoStack.push({
+                            id: currentNote.id,
+                            title: currentNote.title,
+                            content: elements.noteContent.innerHTML
+                        });
+                        
+                        // Восстанавливаем отмененное состояние
+                        elements.noteContent.innerHTML = state.content;
+                        updateToolbarStates();
+                        showNotification('Действие повторено');
+                    }
+                }
+            });
+            
+            document.getElementById('cut-action').addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0) {
+                    navigator.clipboard.writeText(selection.toString())
+                        .then(() => {
+                            const range = selection.getRangeAt(0);
+                            range.deleteContents();
+                            addToUndoStack();
+                            showNotification('Текст вырезан');
+                        })
+                        .catch(err => {
+                            showNotification('Ошибка при вырезании текста');
+                        });
+                }
+            });
+            
+            document.getElementById('copy-action').addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0) {
+                    navigator.clipboard.writeText(selection.toString())
+                        .then(() => {
+                            showNotification('Текст скопирован');
+                        })
+                        .catch(err => {
+                            showNotification('Ошибка при копировании текста');
+                        });
+                }
+            });
+            
+            document.getElementById('paste-action').addEventListener('click', function() {
+                navigator.clipboard.readText()
+                    .then(text => {
+                        const selection = window.getSelection();
+                        if (selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            range.deleteContents();
+                            range.insertNode(document.createTextNode(text));
+                            addToUndoStack();
+                            showNotification('Текст вставлен');
+                        }
+                    })
+                    .catch(err => {
+                        showNotification('Ошибка при вставке текста');
+                    });
+            });
+            
+            document.getElementById('delete-action').addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    addToUndoStack();
+                    showNotification('Текст удален');
+                }
+            });
+            
+            document.getElementById('find-action').addEventListener('click', function() {
+                elements.findDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+                document.getElementById('find-text').focus();
+            });
+            
+            document.getElementById('replace-action').addEventListener('click', function() {
+                elements.findDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+                document.getElementById('find-text').focus();
+            });
+            
+            document.getElementById('select-all').addEventListener('click', function() {
+                const range = document.createRange();
+                range.selectNodeContents(elements.noteContent);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                updateToolbarStates();
+            });
+            
+            document.getElementById('time-date').addEventListener('click', insertDateTime);
+            
+            // Обработчики для меню "Формат"
+            document.getElementById('word-wrap').addEventListener('click', function() {
+                app.wordWrap = !app.wordWrap;
+                elements.noteContent.style.whiteSpace = app.wordWrap ? 'normal' : 'nowrap';
+                this.textContent = app.wordWrap ? 'Отключить перенос по словам' : 'Перенос по словам';
+                showNotification(app.wordWrap ? 'Перенос по словам включен' : 'Перенос по словам отключен');
+            });
+            
+            document.getElementById('font-settings').addEventListener('click', function() {
+                elements.fontDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+                
+                // Устанавливаем текущие настройки шрифта
+                const note = getCurrentNote();
+                if (note && note.fontSettings) {
+                    document.getElementById('font-family').value = note.fontSettings.family;
+                    document.getElementById('font-size').value = parseInt(note.fontSettings.size) || 12;
+                    document.getElementById('font-bold').checked = note.fontSettings.bold;
+                    document.getElementById('font-italic').checked = note.fontSettings.italic;
+                    document.getElementById('font-underline').checked = note.fontSettings.underline;
+                }
+            });
+            
+            document.getElementById('make-uppercase').addEventListener('click', function() {
+                changeTextCase(true);
+                showNotification('Текст преобразован в верхний регистр');
+            });
+            
+            document.getElementById('make-lowercase').addEventListener('click', function() {
+                changeTextCase(false);
+                showNotification('Текст преобразован в нижний регистр');
+            });
+            
+            // Обработчики для меню "Вид"
+            document.getElementById('status-bar-toggle').addEventListener('click', function() {
+                app.showStatusBar = !app.showStatusBar;
+                elements.statusBar.style.display = app.showStatusBar ? 'flex' : 'none';
+                this.textContent = app.showStatusBar ? 'Скрыть строку состояния' : 'Показать строку состояния';
+            });
+            
+            document.getElementById('toolbar-toggle').addEventListener('click', function() {
+                app.showToolbar = !app.showToolbar;
+                elements.toolbar.style.display = app.showToolbar ? 'flex' : 'none';
+                this.textContent = app.showToolbar ? 'Скрыть панель инструментов' : 'Показать панель инструментов';
+            });
+            
+            document.getElementById('zoom-in').addEventListener('click', function() {
+                if (app.zoomLevel < 200) {
+                    app.zoomLevel += 10;
+                    elements.noteContent.style.fontSize = `${app.zoomLevel}%`;
+                    showNotification(`Масштаб: ${app.zoomLevel}%`);
+                }
+            });
+            
+            document.getElementById('zoom-out').addEventListener('click', function() {
+                if (app.zoomLevel > 50) {
+                    app.zoomLevel -= 10;
+                    elements.noteContent.style.fontSize = `${app.zoomLevel}%`;
+                    showNotification(`Масштаб: ${app.zoomLevel}%`);
+                }
+            });
+            
+            document.getElementById('zoom-reset').addEventListener('click', function() {
+                app.zoomLevel = 100;
+                elements.noteContent.style.fontSize = `${app.zoomLevel}%`;
+                showNotification(`Масштаб сброшен: ${app.zoomLevel}%`);
+            });
+            
+            // Обработчики для меню "Справка"
+            document.getElementById('help-topics').addEventListener('click', function() {
+                showNotification('Справка будет открыта в отдельном окне');
+            });
+            
+            document.getElementById('about-program').addEventListener('click', function() {
+                elements.aboutDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+            });
+            
+            // Обработчики для кнопок панели инструментов
+            document.getElementById('new-btn').addEventListener('click', createNewNote);
+            document.getElementById('open-btn').addEventListener('click', function() {
+                document.querySelector('.tab[data-tab="notes-list"]').click();
+            });
+            document.getElementById('save-btn').addEventListener('click', saveNote);
+            document.getElementById('print-btn').addEventListener('click', function() {
+                elements.printDialog.style.display = 'block';
+                elements.modalOverlay.style.display = 'block';
+            });
+            document.getElementById('cut-btn').addEventListener('click', function() {
+                document.getElementById('cut-action').click();
+            });
+            document.getElementById('copy-btn').addEventListener('click', function() {
+                document.getElementById('copy-action').click();
+            });
+            document.getElementById('paste-btn').addEventListener('click', function() {
+                document.getElementById('paste-action').click();
+            });
+            document.getElementById('undo-btn').addEventListener('click', function() {
+                document.getElementById('undo-action').click();
+            });
+            document.getElementById('redo-btn').addEventListener('click', function() {
+                document.getElementById('redo-action').click();
+            });
+            document.getElementById('find-btn').addEventListener('click', function() {
+                document.getElementById('find-action').click();
+            });
+            document.getElementById('replace-btn').addEventListener('click', function() {
+                document.getElementById('replace-action').click();
+            });
+            document.getElementById('bold-btn').addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const parentElement = range.commonAncestorContainer.nodeType === 3 ? 
+                        range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+                    
+                    if (parentElement.classList.contains('bold-text')) {
+                        removeFormatting();
+                    } else {
+                        applyFormatting('bold-text');
+                    }
+                    
+                    updateToolbarStates();
+                }
+            });
+            
+            document.getElementById('italic-btn').addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const parentElement = range.commonAncestorContainer.nodeType === 3 ? 
+                        range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+                    
+                    if (parentElement.classList.contains('italic-text')) {
+                        removeFormatting();
+                    } else {
+                        applyFormatting('italic-text');
+                    }
+                    
+                    updateToolbarStates();
+                }
+            });
+            
+            document.getElementById('underline-btn').addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const range = selection.getRangeAt(0);
+                    const parentElement = range.commonAncestorContainer.nodeType === 3 ? 
+                        range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+                    
+                    if (parentElement.classList.contains('underline-text')) {
+                        removeFormatting();
+                    } else {
+                        applyFormatting('underline-text');
+                    }
+                    
+                    updateToolbarStates();
+                }
+            });
+            
+            // Обработчики для диалогов
+            document.getElementById('close-about').addEventListener('click', function() {
+                elements.aboutDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('apply-font').addEventListener('click', function() {
+                const fontFamily = document.getElementById('font-family').value;
+                const fontSize = document.getElementById('font-size').value + 'px';
+                const isBold = document.getElementById('font-bold').checked;
+                const isItalic = document.getElementById('font-italic').checked;
+                const isUnderline = document.getElementById('font-underline').checked;
+                const applyToAll = document.getElementById('apply-to-all').checked;
+                
+                // Применяем к текущей заметке
+                elements.noteContent.style.fontFamily = fontFamily;
+                elements.noteContent.style.fontSize = fontSize;
+                
+                // Обновляем настройки шрифта в заметке
+                const note = getCurrentNote();
+                if (note) {
+                    note.fontSettings = {
+                        family: fontFamily,
+                        size: fontSize,
+                        bold: isBold,
+                        italic: isItalic,
+                        underline: isUnderline
+                    };
+                    
+                    if (applyToAll) {
+                        // Применяем ко всем заметкам
+                        app.notes.forEach(n => {
+                            n.fontSettings = {
+                                family: fontFamily,
+                                size: fontSize,
+                                bold: isBold,
+                                italic: isItalic,
+                                underline: isUnderline
+                            };
+                        });
+                        
+                        showNotification('Шрифт применен ко всем заметкам');
+                    } else {
+                        showNotification('Шрифт применен к текущей заметке');
+                    }
+                    
+                    saveNotesToStorage();
+                }
+                
+                elements.fontDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('cancel-font').addEventListener('click', function() {
+                elements.fontDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('print-preview-btn').addEventListener('click', function() {
+                showNotification('Предпросмотр печати будет открыт в отдельном окне');
+            });
+            
+            document.getElementById('print-cancel-btn').addEventListener('click', function() {
+                elements.printDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('print-now-btn').addEventListener('click', printNote);
+            
+            document.getElementById('find-next-btn').addEventListener('click', findTextInNote);
+            document.getElementById('replace-btn-dlg').addEventListener('click', replaceTextInNote);
+            document.getElementById('replace-all-btn-dlg').addEventListener('click', replaceAllTextInNote);
+            document.getElementById('find-cancel-btn').addEventListener('click', function() {
+                elements.findDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('export-cancel-btn').addEventListener('click', function() {
+                elements.exportDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('export-now-btn').addEventListener('click', exportNote);
+            
+            document.getElementById('import-cancel-btn').addEventListener('click', function() {
+                elements.importDialog.style.display = 'none';
+                elements.modalOverlay.style.display = 'none';
+            });
+            
+            document.getElementById('import-now-btn').addEventListener('click', importNote);
+            
+            // Обработчики для вкладки "Все заметки"
+            document.getElementById('notes-filter').addEventListener('input', renderNotesList);
+            document.getElementById('notes-sort').addEventListener('change', renderNotesList);
+            document.getElementById('delete-selected-notes').addEventListener('click', deleteSelectedNotes);
+            
+            // Обработчики для вкладки "Поиск"
+            document.getElementById('search-query').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            document.getElementById('search-btn').addEventListener('click', performSearch);
+            document.getElementById('replace-btn').addEventListener('click', performReplace);
+            document.getElementById('replace-all-btn').addEventListener('click', performReplaceAll);
+            
+            // Обработчики для контекстного меню
+            elements.noteContent.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                
+                const selection = window.getSelection();
+                const hasSelection = selection.toString().length > 0;
+                
+                // Обновляем состояния пунктов меню
+                document.getElementById('ctx-cut').className = hasSelection ? 
+                    'context-menu-item' : 'context-menu-item disabled';
+                document.getElementById('ctx-copy').className = hasSelection ? 
+                    'context-menu-item' : 'context-menu-item disabled';
+                document.getElementById('ctx-bold').className = hasSelection ? 
+                    'context-menu-item' : 'context-menu-item disabled';
+                document.getElementById('ctx-italic').className = hasSelection ? 
+                    'context-menu-item' : 'context-menu-item disabled';
+                document.getElementById('ctx-underline').className = hasSelection ? 
+                    'context-menu-item' : 'context-menu-item disabled';
+                document.getElementById('ctx-select-all').className = elements.noteContent.textContent.length > 0 ? 
+                    'context-menu-item' : 'context-menu-item disabled';
+                
+                // Показываем меню
+                elements.contextMenu.style.display = 'block';
+                elements.contextMenu.style.left = `${e.pageX}px`;
+                elements.contextMenu.style.top = `${e.pageY}px`;
+            });
+            
+            document.getElementById('ctx-cut').addEventListener('click', function() {
+                document.getElementById('cut-action').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            document.getElementById('ctx-copy').addEventListener('click', function() {
+                document.getElementById('copy-action').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            document.getElementById('ctx-paste').addEventListener('click', function() {
+                document.getElementById('paste-action').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            document.getElementById('ctx-bold').addEventListener('click', function() {
+                document.getElementById('bold-btn').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            document.getElementById('ctx-italic').addEventListener('click', function() {
+                document.getElementById('italic-btn').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            document.getElementById('ctx-underline').addEventListener('click', function() {
+                document.getElementById('underline-btn').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            document.getElementById('ctx-select-all').addEventListener('click', function() {
+                document.getElementById('select-all').click();
+                elements.contextMenu.style.display = 'none';
+            });
+            
+            // Обработчики для модального оверлея
+            elements.modalOverlay.addEventListener('click', function() {
+                document.querySelectorAll('.dialog').forEach(d => d.style.display = 'none');
+                this.style.display = 'none';
+            });
+            
+            // Обработчики для редактора
+            elements.noteContent.addEventListener('input', function() {
+                addToUndoStack();
+                updateStatus('Изменения не сохранены');
+            });
+            
+            elements.noteContent.addEventListener('click', function() {
+                updateToolbarStates();
+                updateStatus('');
+            });
+            
+            elements.noteContent.addEventListener('keyup', function() {
+                updateToolbarStates();
+                updateStatus('');
+            });
+            
+            elements.noteContent.addEventListener('mouseup', function() {
+                updateToolbarStates();
+            });
+            
+            elements.noteTitle.addEventListener('input', function() {
+                updateStatus('Изменения не сохранены');
+            });
+            
+            // Обработчики для перетаскивания окна
+            const windowHeader = elements.mainWindow.querySelector('.window-header');
+            
+            windowHeader.addEventListener('mousedown', function(e) {
+                if (e.target === this || e.target === this.querySelector('span')) {
+                    app.isDragging = true;
+                    app.dragStartX = e.clientX;
+                    app.dragStartY = e.clientY;
+                    
+                    const rect = elements.mainWindow.getBoundingClientRect();
+                    app.windowStartX = rect.left;
+                    app.windowStartY = rect.top;
+                    
+                    document.addEventListener('mousemove', dragWindow);
+                    document.addEventListener('mouseup', stopDragWindow);
+                }
+            });
+            
+            function dragWindow(e) {
+                if (!app.isDragging) return;
+                
+                const dx = e.clientX - app.dragStartX;
+                const dy = e.clientY - app.dragStartY;
+                
+                elements.mainWindow.style.left = `${app.windowStartX + dx}px`;
+                elements.mainWindow.style.top = `${app.windowStartY + dy}px`;
+            }
+            
+            function stopDragWindow() {
+                app.isDragging = false;
+                document.removeEventListener('mousemove', dragWindow);
+                document.removeEventListener('mouseup', stopDragWindow);
+            }
+            
+            // Обработчики для кнопок управления окном
+            elements.minimizeBtn.addEventListener('click', function() {
+                elements.mainWindow.style.display = 'none';
+                // В реальном приложении здесь была бы логика сворачивания
+                setTimeout(() => {
+                    elements.mainWindow.style.display = 'flex';
+                }, 1000);
+            });
+            
+            elements.maximizeBtn.addEventListener('click', function() {
+                if (app.isMaximized) {
+                    // Восстанавливаем исходный размер
+                    elements.mainWindow.style.width = app.originalSize.width;
+                    elements.mainWindow.style.height = app.originalSize.height;
+                    elements.mainWindow.style.left = app.originalSize.left;
+                    elements.mainWindow.style.top = app.originalSize.top;
+                } else {
+                    // Запоминаем исходный размер
+                    app.originalSize = {
+                        width: elements.mainWindow.style.width,
+                        height: elements.mainWindow.style.height,
+                        left: elements.mainWindow.style.left,
+                        top: elements.mainWindow.style.top
+                    };
+                    
+                    // Разворачиваем на весь экран
+                    elements.mainWindow.style.width = 'calc(100% - 20px)';
+                    elements.mainWindow.style.height = 'calc(100% - 20px)';
+                    elements.mainWindow.style.left = '10px';
+                    elements.mainWindow.style.top = '10px';
+                }
+                
+                app.isMaximized = !app.isMaximized;
+            });
+            
+            elements.closeBtn.addEventListener('click', function() {
+                if (elements.noteContent.textContent && !confirm('У вас есть несохраненные изменения. Закрыть без сохранения?')) {
+                    return;
+                }
+                elements.mainWindow.style.display = 'none';
+                // В реальном приложении здесь было бы закрытие окна
+                setTimeout(() => {
+                    showNotification('Приложение закрыто (в реальной версии окно бы закрылось)');
+                    elements.mainWindow.style.display = 'flex';
+                }, 500);
+            });
+            
+            // Горячие клавиши
+            document.addEventListener('keydown', function(e) {
+                // Проверяем, что фокус не в поле ввода
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    // Ctrl+N - новая заметка
+                    if (e.ctrlKey && e.key === 'n') {
+                        e.preventDefault();
+                        createNewNote();
+                    }
+                    // Ctrl+O - открыть список заметок
+                    else if (e.ctrlKey && e.key === 'o') {
+                        e.preventDefault();
+                        document.querySelector('.tab[data-tab="notes-list"]').click();
+                    }
+                    // Ctrl+S - сохранить
+                    else if (e.ctrlKey && e.key === 's') {
+                        e.preventDefault();
+                        saveNote();
+                    }
+                    // Ctrl+Z - отменить
+                    else if (e.ctrlKey && e.key === 'z') {
+                        e.preventDefault();
+                        document.getElementById('undo-action').click();
+                    }
+                    // Ctrl+Y - повторить
+                    else if (e.ctrlKey && e.key === 'y') {
+                        e.preventDefault();
+                        document.getElementById('redo-action').click();
+                    }
+                    // Ctrl+X - вырезать
+                    else if (e.ctrlKey && e.key === 'x') {
+                        e.preventDefault();
+                        document.getElementById('cut-action').click();
+                    }
+                    // Ctrl+C - копировать
+                    else if (e.ctrlKey && e.key === 'c') {
+                        e.preventDefault();
+                        document.getElementById('copy-action').click();
+                    }
+                    // Ctrl+V - вставить
+                    else if (e.ctrlKey && e.key === 'v') {
+                        e.preventDefault();
+                        document.getElementById('paste-action').click();
+                    }
+                    // Ctrl+A - выделить все
+                    else if (e.ctrlKey && e.key === 'a') {
+                        e.preventDefault();
+                        document.getElementById('select-all').click();
+                    }
+                    // Ctrl+F - найти
+                    else if (e.ctrlKey && e.key === 'f') {
+                        e.preventDefault();
+                        document.getElementById('find-action').click();
+                    }
+                    // Ctrl+H - заменить
+                    else if (e.ctrlKey && e.key === 'h') {
+                        e.preventDefault();
+                        document.getElementById('replace-action').click();
+                    }
+                    // Ctrl+B - жирный
+                    else if (e.ctrlKey && e.key === 'b') {
+                        e.preventDefault();
+                        document.getElementById('bold-btn').click();
+                    }
+                    // Ctrl+I - курсив
+                    else if (e.ctrlKey && e.key === 'i') {
+                        e.preventDefault();
+                        document.getElementById('italic-btn').click();
+                    }
+                    // Ctrl+U - подчеркнутый
+                    else if (e.ctrlKey && e.key === 'u') {
+                        e.preventDefault();
+                        document.getElementById('underline-btn').click();
+                    }
+                }
+            });
+            
+            // ===== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ =====
+            
+            // Загружаем первую заметку, если есть
+            if (app.notes.length > 0) {
+                loadNote(app.notes[0].id);
+            } else {
+                createNewNote();
+            }
+            
+            // Обновляем статус
+            updateStatus('Готов');
+            updateToolbarStates();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
